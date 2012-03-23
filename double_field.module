@@ -60,9 +60,9 @@ function double_field_field_settings_form($field, $instance, $has_data) {
   );
   $form['first']['column_type'] = array(
     '#type' => 'select',
-    '#title' => t('Select the field type'),
+    '#title' => t('Select the datatype for this field'),
     '#default_value' => $field['settings']['first']['column_type'],
-    '#options' => array('varchar' => 'varchar', 'text' => 'text'),
+    '#options' => array('varchar' => 'varchar', 'text' => 'longtext'),
     '#description' => t('Decides the field type for this subfield'),
     '#disabled' => $has_data,
   );
@@ -79,7 +79,7 @@ function double_field_field_settings_form($field, $instance, $has_data) {
     '#type' => 'select',
     '#title' => t('Select the field type'),
     '#default_value' => $field['settings']['second']['column_type'],
-    '#options' => array('varchar' => 'varchar', 'text' => 'text'),
+    '#options' => array('varchar' => 'varchar', 'text' => 'longtext'),
     '#description' => t('Decides the field type for this subfield'),
     '#disabled' => $has_data,
   );
