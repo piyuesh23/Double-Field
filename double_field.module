@@ -15,7 +15,16 @@ function double_field_field_info() {
       'description' => t('Double text field'),
       'default_widget' => 'double_field',
       'default_formatter' => 'double_field_inline',
-      'settings' => array('first_maxlength' => 255, 'second_maxlength' => 255),
+      'settings' => array(
+        'first' => array(
+          'first_maxlength' => 255,
+          'column_type' => 'varchar',
+        ),
+        'second' => array(
+          'second_maxlength' => 255,
+          'column_type' => 'varchar',
+        ),
+      ),
       // Integrate with the Entity Metadata module.
       'property_type' => 'double_field',
       'property_callbacks' => array('double_field_property_callback'),
@@ -28,22 +37,50 @@ function double_field_field_info() {
  */
 function double_field_field_settings_form($field, $instance, $has_data) {
   $settings = $field['settings'];
-  $form['first_maxlength'] = array(
+  $form['first'] = array(
+      '#title' => t('key'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+  );
+  $form['second'] = array(
+      '#title' => t('value'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+  );
+  $form['first']['first_maxlength'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum length of the first textfield'),
-    '#default_value' => $settings['first_maxlength'],
+    '#default_value' => $settings['first']['first_maxlength'],
     '#required' => TRUE,
     '#description' => t('The maximum length of the first textfield in characters.'),
     '#element_validate' => array('_element_validate_integer_positive'),
     '#disabled' => $has_data,
   );
-  $form['second_maxlength'] = array(
+  $form['first']['column_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Select the field type'),
+    '#default_value' => $field['settings']['first']['column_type'],
+    '#options' => array('varchar' => 'varchar', 'text' => 'text'),
+    '#description' => t('Decides the field type for this subfield'),
+    '#disabled' => $has_data,
+  );
+  $form['second']['second_maxlength'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum length of the second textfield'),
-    '#default_value' => $settings['second_maxlength'],
+    '#default_value' => $settings['second']['second_maxlength'],
     '#required' => TRUE,
     '#description' => t('The maximum length of the second field in characters.'),
     '#element_validate' => array('_element_validate_integer_positive'),
+    '#disabled' => $has_data,
+  );
+  $form['second']['column_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Select the field type'),
+    '#default_value' => $field['settings']['second']['column_type'],
+    '#options' => array('varchar' => 'varchar', 'text' => 'text'),
+    '#description' => t('Decides the field type for this subfield'),
     '#disabled' => $has_data,
   );
   return $form;
@@ -63,8 +100,8 @@ function double_field_field_validate($entity_type, $entity, $field, $instance, $
   $settings = $instance['widget']['settings'];
   if ($entity_type && $instance['required']) {
     $error = array(
-      'error' => 'double_field_required', 
-      'error_element' => array('first' => TRUE, 'second' => TRUE), 
+      'error' => 'double_field_required',
+      'error_element' => array('first' => TRUE, 'second' => TRUE),
       'message' => t('%name field is required.', array('%name' => $instance['label'])),
     );
     $field_is_empty = TRUE;
@@ -166,14 +203,20 @@ function double_field_field_widget_form(&$form, &$form_state, $field, $instance,
     '#theme_wrappers' => array('form_element'),
   );
   foreach (array('first', 'second') as $subfield) {
+    if($field['settings'][$subfield]['column_type'] == 'varchar')
+      $type = 'textfield';
+    elseif($field['settings'][$subfield]['column_type'] == 'text')
+      $type = 'textarea';
     $double_field[$subfield] = array(
-      '#type' => 'textfield',
+      '#type' => $type,
       '#prefix' => $settings[$subfield]['prefix'],
       '#suffix' => $settings[$subfield]['suffix'],
       '#default_value' => isset($items[$delta][$subfield]) ? $items[$delta][$subfield] : NULL,
       '#size' => $settings[$subfield]['size'],
-      '#maxlength' => $field['settings'][$subfield . '_maxlength'],
     );
+    if($type != 'text') {
+      $double_field[$subfield]['#maxlength'] = $field['settings'][$subfield][$subfield . '_maxlength'];
+    }
   }
   if ($settings['inline']) {
     $double_field['first']['#prefix']  = '<div class="container-inline">' . $double_field['first']['#prefix'];

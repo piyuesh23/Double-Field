@@ -10,26 +10,35 @@
  * Implements hook_field_schema().
  */
 function double_field_field_schema($field) {
+#  if($field['type'] == 'double_field') {
+#    $columns = array(
+#      'first' => array(
+#        'type' => $field['settings']['first']['column_type'],
+#        'not null' => FALSE,
+#      ),
+#      'second' => array(
+#        'type' => $field['settings']['second']['column_type'],
+#        'not null' => FALSE,
+#      ),
+#    );
+#    if($field['settings']['first']['column_type'] == 'varchar') {
+#      $length = $field['settings']['first']['first_maxlength'];
+#      $columns['first']['length'] = $length;
+#    }
+#    elseif($field['settings']['first']['column_type'] == 'text') {
+#      $columns['first']['size'] = 'big';
+#    }
 
-  $columns = array(
-    'first' => array(
-      'type' => 'varchar',
-      'length' => $field['settings']['first_maxlength'],
-      'not null' => FALSE,
-    ),
-    'second' => array(
-      'type' => 'varchar',
-      'length' => $field['settings']['second_maxlength'],
-      'not null' => FALSE,
-    ),
-  );
-  $indexes = array(
-    'first' => array('first'),
-    'second' => array('second'),
-  );
+#    if($field['settings']['second']['column_type'] == 'varchar') {
+#      $length = $field['settings']['second']['second_maxlength'];
+#      $columns['second']['length'] = $length;
+#    }
+#    elseif($field['settings']['second']['column_type'] == 'text') {
+#      $columns['second']['size'] = 'big';
+#    }
+#    return array(
+#      'columns' => $columns
+#    );
+#  }
 
-  return array(
-    'columns' => $columns,
-    'indexes' => $indexes
-  );
 }
